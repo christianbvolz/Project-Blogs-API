@@ -49,7 +49,13 @@ const validateAuthorization = async (authorization) => {
 };
 
 const listAll = async () => {
-  const user = await models.User.findAll();
+  const users = await models.User.findAll();
+
+  return users;
+};
+
+const findById = async (id) => {
+  const [user] = await models.User.findAll({ where: { id } });
 
   return user;
 };
@@ -60,4 +66,5 @@ module.exports = {
   validateLogin,
   validateAuthorization,
   listAll,
+  findById,
 };

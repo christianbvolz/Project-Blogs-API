@@ -36,4 +36,21 @@ router.get('/', rescue(async (req, res) => {
   return res.status(200).json(users);
 }));
 
+router.get('/:id', rescue(async (req, res) => {
+  const { authorization } = req.headers;
+  const { id } = req.params;
+  
+  if (!authorization) return res.status(401).json({ message: 'Token not found' });
+
+  const authorized = await userService.validateAuthorization(authorization);
+
+  if (!authorized) return res.status(401).json({ message: 'Expired or invalid token' });
+
+  const user = await userService.findById(id);
+
+  if (!user) return res.status(404).json({ message: 'User does not exist' });
+
+  return res.status(200).json(user);
+}));
+
 module.exports = router;
