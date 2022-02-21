@@ -1,4 +1,3 @@
-require('dotenv/config');
 const jwt = require('jsonwebtoken');
 
 const models = require('../models');
@@ -39,15 +38,6 @@ const validateLogin = async ({ email, password }) => {
   return false;
 };
 
-const validateAuthorization = async (authorization) => {
-  try {
-    const result = jwt.verify(authorization, SECRET);
-    return result;
-  } catch (_error) {
-    return false;
-  }
-};
-
 const listAll = async () => {
   const users = await models.User.findAll();
 
@@ -64,7 +54,6 @@ module.exports = {
   create,
   findByEmail,
   validateLogin,
-  validateAuthorization,
   listAll,
   findById,
 };

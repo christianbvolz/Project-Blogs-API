@@ -2,6 +2,7 @@ const router = require('express').Router();
 const rescue = require('express-rescue');
 const Joi = require('joi');
 const userService = require('../services/UserService');
+const validateAuthorization = require('./utils/validateAuthorization');
 const { validateWithJoi } = require('./utils/joi');
 
 const userSchema = Joi.object({
@@ -27,7 +28,7 @@ router.get('/', rescue(async (req, res) => {
   const { authorization } = req.headers;
   if (!authorization) return res.status(401).json({ message: 'Token not found' });
 
-  const authorized = await userService.validateAuthorization(authorization);
+  const authorized = await validateAuthorization(authorization);
 
   if (!authorized) return res.status(401).json({ message: 'Expired or invalid token' });
 
@@ -42,7 +43,7 @@ router.get('/:id', rescue(async (req, res) => {
   
   if (!authorization) return res.status(401).json({ message: 'Token not found' });
 
-  const authorized = await userService.validateAuthorization(authorization);
+  const authorized = await validateAuthorization(authorization);
 
   if (!authorized) return res.status(401).json({ message: 'Expired or invalid token' });
 
