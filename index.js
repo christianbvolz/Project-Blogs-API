@@ -7,6 +7,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use('/user', require('./controllers/UserController'));
+app.use('/login', require('./controllers/LoginController'));
 
 app.use(middlewares.joiError);
 app.use(middlewares.domainError);

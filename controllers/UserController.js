@@ -16,9 +16,10 @@ router.post('/', rescue(async (req, res) => {
   validateWithJoi(productSchema, { displayName, email, password, image });
   const user = await userService.findByEmail(email);
 
-  if (user.length !== 0) return res.status(409).json({ message: 'User already registered' });
+  if (user) return res.status(409).json({ message: 'User already registered' });
 
   const { token } = await userService.create({ displayName, email, password, image });
+
   return res.status(201).json({ token });
 }));
 

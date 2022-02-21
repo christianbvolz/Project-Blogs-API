@@ -17,11 +17,30 @@ const create = async ({ displayName, email, password, image }) => {
 };
 
 const findByEmail = async (email) => {
-  const result = await models.User.findAll({ where: { email } });
-  return result;
+  const [user] = await models.User.findAll({ where: { email } });
+  
+  if (!user) return false;
+
+  return true;
+};
+
+const validateLogin = async ({ email, password }) => {
+  const [user] = await models.User.findAll({ where: { email, password } });
+  
+  if (user) {
+    const token = jwt.sign(user.dataValues, SECRET, {
+      algorithm: 'HS256',
+      expiresIn: '1d',
+    });
+  
+    return { token, user };
+  }
+
+  return false;
 };
 
 module.exports = {
   create,
   findByEmail,
+  validateLogin,
 };
