@@ -12,7 +12,14 @@ const create = async ({ name }) => {
   return category;
 };
 
+const getAll = async () => {
+  const categories = await models.Category.findAll();
+  
+  return categories;
+};
+
 module.exports = {
   findCategory,
   create,
+  getAll,
 };
