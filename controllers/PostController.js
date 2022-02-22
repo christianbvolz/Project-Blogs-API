@@ -1,8 +1,10 @@
 const router = require('express').Router();
 const rescue = require('express-rescue');
 const Joi = require('joi');
-const postService = require('../services/PostService');
+const PostService = require('../services/PostService');
 const CategoryService = require('../services/CategoryService');
+const PostCategoryService = require('../services/PostCategoryService');
+
 const validateAuthorization = require('./utils/validateAuthorization');
 const { validateWithJoi } = require('./utils/joi');
 
@@ -23,15 +25,33 @@ router.post('/', rescue(async (req, res) => {
 
   if (!authorized) return res.status(401).json({ message: 'Expired or invalid token' });
 
-  const categories = await CategoryService.findCategories(categoryIds);
+  const categories = await CategoryService.findById(categoryIds);
 
   if (categories.length < categoryIds.length) {
     return res.status(400).json({ message: '"categoryIds" not found' });
   }
 
-  const newPost = await postService.create({ title, content, userId: authorized.id });
+  const newPost = await PostService.create({ title, content, userId: authorized.id });
+
+  categoryIds.forEach(async (categoryId) => {
+    await PostCategoryService.create({ postId: newPost.id, categoryId });
+  });
 
   return res.status(201).json(newPost);
+}));
+
+router.get('/', rescue(async (req, res) => {
+  const { authorization } = req.headers;
+
+  if (!authorization) return res.status(401).json({ message: 'Token not found' });
+
+  const authorized = await validateAuthorization(authorization);
+
+  if (!authorized) return res.status(401).json({ message: 'Expired or invalid token' });
+
+  const allPosts = await PostService.findAll();
+
+  return res.status(200).json(allPosts);
 }));
 
 module.exports = router;

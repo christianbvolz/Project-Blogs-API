@@ -1,6 +1,6 @@
 const models = require('../models');
 
-const findCategory = async ({ name }) => {
+const findByName = async ({ name }) => {
   const [category] = await models.Category.findAll({ where: { name } });
 
   return category;
@@ -18,15 +18,15 @@ const getAll = async () => {
   return categories;
 };
 
-const findCategories = async (categoryIds) => {
+const findById = async (categoryIds) => {
   const category = await models.Category.findAll({ where: { id: categoryIds } });
 
   return category;
 };
 
 module.exports = {
-  findCategory,
+  findByName,
   create,
   getAll,
-  findCategories,
+  findById,
 };

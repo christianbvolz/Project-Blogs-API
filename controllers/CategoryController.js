@@ -19,7 +19,7 @@ router.post('/', rescue(async (req, res) => {
 
   if (!authorized) return res.status(401).json({ message: 'Expired or invalid token' });
 
-  const category = await categoryService.findCategory({ name });
+  const category = await categoryService.findByName({ name });
 
   if (category) return res.status(409).json({ message: 'Category already registered' });
 
