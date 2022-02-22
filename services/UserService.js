@@ -50,10 +50,17 @@ const findById = async (id) => {
   return user;
 };
 
+const deleteUser = async ({ id }) => {
+  const result = await models.User.destroy({ where: { id } });
+
+  return result;
+};
+
 module.exports = {
   create,
   findByEmail,
   validateLogin,
   listAll,
   findById,
+  deleteUser,
 };

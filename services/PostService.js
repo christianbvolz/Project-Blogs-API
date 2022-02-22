@@ -35,10 +35,17 @@ const deletePost = async ({ id }) => {
   return editedPost;
 };
 
+const deletePostByUser = async ({ userId }) => {
+  const editedPost = await models.BlogPost.destroy({ where: { userId } });
+  
+  return editedPost;
+};
+
 module.exports = {
   create,
   findAll,
   findOne,
   update,
   deletePost,
+  deletePostByUser,
 };
