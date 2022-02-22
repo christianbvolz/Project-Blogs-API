@@ -54,4 +54,21 @@ router.get('/', rescue(async (req, res) => {
   return res.status(200).json(allPosts);
 }));
 
+router.get('/:id', rescue(async (req, res) => {
+  const { authorization } = req.headers;
+  const { id } = req.params;
+
+  if (!authorization) return res.status(401).json({ message: 'Token not found' });
+
+  const authorized = await validateAuthorization(authorization);
+
+  if (!authorized) return res.status(401).json({ message: 'Expired or invalid token' });
+
+  const post = await PostService.findOne(id);
+
+  if (!post) return res.status(404).json({ message: 'Post does not exist' });
+
+  return res.status(200).json(post);
+}));
+
 module.exports = router;

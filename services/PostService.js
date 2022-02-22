@@ -14,7 +14,17 @@ const findAll = async () => {
   return allPosts;
 };
 
+const findOne = async (id) => {
+  const post = await models.BlogPost.findOne({
+    where: { id },
+    include: [{ model: models.User, as: 'user' }, { model: models.Category, as: 'categories' }],
+  });
+
+  return post;
+};
+
 module.exports = {
   create,
   findAll,
+  findOne,
 };
