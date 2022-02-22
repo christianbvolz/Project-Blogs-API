@@ -14,6 +14,12 @@ const postSchema = Joi.object({
   categoryIds: Joi.array().required(),
 });
 
+const postUpdateSchema = Joi.object({
+  title: Joi.string().required(),
+  content: Joi.string().required(),
+  categoryIds: Joi.any().forbidden(),
+});
+
 router.post('/', rescue(async (req, res) => {
   const { authorization } = req.headers;
   const { title, content, categoryIds } = req.body;
@@ -69,6 +75,32 @@ router.get('/:id', rescue(async (req, res) => {
   if (!post) return res.status(404).json({ message: 'Post does not exist' });
 
   return res.status(200).json(post);
+}));
+
+router.put('/:id', rescue(async (req, res) => {
+  const { authorization } = req.headers;
+  const { id } = req.params;
+  const { title, content, categoryIds } = req.body;
+  
+  validateWithJoi(postUpdateSchema, { title, content, categoryIds });
+
+  if (!authorization) return res.status(401).json({ message: 'Token not found' });
+
+  const authorized = await validateAuthorization(authorization);
+  
+  if (!authorized) return res.status(401).json({ message: 'Expired or invalid token' });
+
+  const post = await PostService.findOne(id);
+
+  if (!post) return res.status(404).json({ message: 'Post does not exist' });
+
+  if (authorized.id !== post.userId) {
+    return res.status(401).json({ message: 'Unauthorized user' });
+  }
+
+  await PostService.update({ id, title, content });
+  
+  return res.status(200).json({ title, content, userId: post.userId, categories: post.categories });
 }));
 
 module.exports = router;
