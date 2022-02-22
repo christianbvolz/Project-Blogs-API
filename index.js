@@ -9,6 +9,7 @@ app.use(bodyParser.json());
 app.use('/user', require('./controllers/UserController'));
 app.use('/login', require('./controllers/LoginController'));
 app.use('/categories', require('./controllers/CategoryController'));
+app.use('/post', require('./controllers/PostController'));
 
 app.use(middlewares.joiError);
 app.use(middlewares.domainError);

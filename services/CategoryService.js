@@ -18,8 +18,15 @@ const getAll = async () => {
   return categories;
 };
 
+const findCategories = async (categoryIds) => {
+  const category = await models.Category.findAll({ where: { id: categoryIds } });
+
+  return category;
+};
+
 module.exports = {
   findCategory,
   create,
   getAll,
+  findCategories,
 };

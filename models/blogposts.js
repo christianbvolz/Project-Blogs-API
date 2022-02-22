@@ -3,8 +3,8 @@ module.exports = (sequelize, DataTypes) => {
     title: DataTypes.STRING,
     content: DataTypes.STRING,
     userId: DataTypes.STRING,
-    published: DataTypes.STRING,
-    updated: DataTypes.STRING,
+    published: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+    updated: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
   }, { timestamps: false });
 
   BlogPost.associate = (models) => {
