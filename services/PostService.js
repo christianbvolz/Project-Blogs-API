@@ -25,6 +25,12 @@ const findOne = async (id) => {
 
 const update = async ({ id, title, content }) => {
   const editedPost = await models.BlogPost.update({ title, content }, { where: { id } });
+
+  return editedPost;
+};
+
+const deletePost = async ({ id }) => {
+  const editedPost = await models.BlogPost.destroy({ where: { id } });
   
   return editedPost;
 };
@@ -34,4 +40,5 @@ module.exports = {
   findAll,
   findOne,
   update,
+  deletePost,
 };

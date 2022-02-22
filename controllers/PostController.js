@@ -8,6 +8,8 @@ const PostCategoryService = require('../services/PostCategoryService');
 const validateAuthorization = require('./utils/validateAuthorization');
 const { validateWithJoi } = require('./utils/joi');
 
+const messages = ['Token not found', 'Expired or invalid token'];
+
 const postSchema = Joi.object({
   title: Joi.string().required(),
   content: Joi.string().required(),
@@ -25,11 +27,11 @@ router.post('/', rescue(async (req, res) => {
   const { title, content, categoryIds } = req.body;
   validateWithJoi(postSchema, { title, content, categoryIds });
 
-  if (!authorization) return res.status(401).json({ message: 'Token not found' });
+  if (!authorization) return res.status(401).json({ message: messages[0] });
 
   const authorized = await validateAuthorization(authorization);
 
-  if (!authorized) return res.status(401).json({ message: 'Expired or invalid token' });
+  if (!authorized) return res.status(401).json({ message: messages[1] });
 
   const categories = await CategoryService.findById(categoryIds);
 
@@ -49,11 +51,11 @@ router.post('/', rescue(async (req, res) => {
 router.get('/', rescue(async (req, res) => {
   const { authorization } = req.headers;
 
-  if (!authorization) return res.status(401).json({ message: 'Token not found' });
+  if (!authorization) return res.status(401).json({ message: messages[0] });
 
   const authorized = await validateAuthorization(authorization);
 
-  if (!authorized) return res.status(401).json({ message: 'Expired or invalid token' });
+  if (!authorized) return res.status(401).json({ message: messages[1] });
 
   const allPosts = await PostService.findAll();
 
@@ -64,11 +66,11 @@ router.get('/:id', rescue(async (req, res) => {
   const { authorization } = req.headers;
   const { id } = req.params;
 
-  if (!authorization) return res.status(401).json({ message: 'Token not found' });
+  if (!authorization) return res.status(401).json({ message: messages[0] });
 
   const authorized = await validateAuthorization(authorization);
 
-  if (!authorized) return res.status(401).json({ message: 'Expired or invalid token' });
+  if (!authorized) return res.status(401).json({ message: messages[1] });
 
   const post = await PostService.findOne(id);
 
@@ -84,11 +86,11 @@ router.put('/:id', rescue(async (req, res) => {
   
   validateWithJoi(postUpdateSchema, { title, content, categoryIds });
 
-  if (!authorization) return res.status(401).json({ message: 'Token not found' });
+  if (!authorization) return res.status(401).json({ message: messages[0] });
 
   const authorized = await validateAuthorization(authorization);
   
-  if (!authorized) return res.status(401).json({ message: 'Expired or invalid token' });
+  if (!authorized) return res.status(401).json({ message: messages[1] });
 
   const post = await PostService.findOne(id);
 
@@ -101,6 +103,31 @@ router.put('/:id', rescue(async (req, res) => {
   await PostService.update({ id, title, content });
   
   return res.status(200).json({ title, content, userId: post.userId, categories: post.categories });
+}));
+
+router.delete('/:id', rescue(async (req, res) => {
+  const { authorization } = req.headers;
+  const { id } = req.params;
+
+  if (!authorization) return res.status(401).json({ message: messages[0] });
+
+  const authorized = await validateAuthorization(authorization);
+  
+  if (!authorized) return res.status(401).json({ message: messages[1] });
+
+  const post = await PostService.findOne(id);
+
+  if (!post) return res.status(404).json({ message: 'Post does not exist' });
+
+  if (authorized.id !== post.userId) {
+    return res.status(401).json({ message: 'Unauthorized user' });
+  }
+  
+  await PostCategoryService.deletePostCategory({ postId: id });
+
+  await PostService.deletePost({ id });
+  
+  return res.status(204).end();
 }));
 
 module.exports = router;
